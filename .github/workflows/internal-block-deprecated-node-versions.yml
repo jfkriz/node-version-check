@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+            fetch-depth: 0  # Fetch all history for all branches
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -21,6 +23,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
           sudo pip install yq
+
+      - name: Fetch main branch
+        run: git fetch origin main          
 
       - name: Check for deprecated Node.js versions in workflows
         run: |
