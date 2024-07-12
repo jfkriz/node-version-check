@@ -57,6 +57,8 @@ jobs:
             if [[ "$node_version" == *"node12"* || "$node_version" == *"node14"* || "$node_version" == *"node16"* ]]; then
               echo "Error: $action uses deprecated Node.js version $node_version"
               error=1
+            else
+              echo "$action uses Node.js version $node_version"
             fi
           }
 
