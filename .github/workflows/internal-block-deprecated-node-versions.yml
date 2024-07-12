@@ -53,7 +53,8 @@ jobs:
               echo "Warning: Could not retrieve metadata for $action"
               return
             fi
-            echo "Metadata: $metadata"
+            echo "$owner_repo@$version"
+            echo "Metadata URL: $metadata_url"
             node_version=$(echo "$metadata" | yq '.runs.using' -)
             if [[ "$node_version" == *"node12"* || "$node_version" == *"node14"* || "$node_version" == *"node16"* ]]; then
               echo "Error: $action uses deprecated Node.js version $node_version"
