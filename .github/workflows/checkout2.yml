@@ -1,4 +1,4 @@
-name: Checkout code
+name: Checkout code 2
 on:
     workflow_dispatch:
 
