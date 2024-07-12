@@ -73,6 +73,7 @@ jobs:
               check_node_version "$use"
               if [ $? -eq 1 ]; then
                 error=1
+                echo "Action file $file contains action $use with deprecated Node.js version"
               fi
             done
           done
