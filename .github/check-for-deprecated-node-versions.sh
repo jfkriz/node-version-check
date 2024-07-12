@@ -8,7 +8,7 @@ if [ -z "$files" ]; then
 fi
 
 # Function to check the node version of an action
-function check_node_version() {
+check_node_version() {
     action=$1
     owner_repo=$(echo "$action" | cut -d'@' -f1)
     version=$(echo "$action" | cut -d'@' -f2)
