@@ -28,4 +28,4 @@ jobs:
         run: git fetch origin main
 
       - name: Check for deprecated Node.js versions in workflows
-        run: ${{ github.action_path }}/check-for-deprecated-node-versions.sh
+        run: $GITHUB_WORKSPACE/.github/check-for-deprecated-node-versions.sh
