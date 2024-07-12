@@ -65,7 +65,7 @@ jobs:
             echo "Checking $file..."
 
             # Parse each action's uses line and check the version
-            yq '.jobs.*.steps[] | select(.uses) | .uses' "$file" | while read -r use; do
+            yq '.jobs[] | .steps[] | select(.uses) | .uses' "$file" | while read -r use; do
               echo "Checking action: $use"
               check_node_version "$use"
             done
