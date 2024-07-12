@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Find all changed YAML files
 files=$(git diff --name-only origin/main...HEAD | grep '\.github/workflows/.*\.yml$')
