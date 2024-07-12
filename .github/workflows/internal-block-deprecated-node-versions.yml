@@ -11,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0  # Fetch all history for all branches
+          fetch-depth: 0  # Fetch all history for all branches
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -25,12 +25,12 @@ jobs:
           sudo pip install yq
 
       - name: Fetch main branch
-        run: git fetch origin main          
+        run: git fetch origin main
 
       - name: Check for deprecated Node.js versions in workflows
         run: |
           # Find all changed YAML files
-          files=$(git diff --name-only origin/main | grep '\.yml$')
+          files=$(git diff --name-only origin/main...HEAD | grep '\.yml$')
           if [ -z "$files" ]; then
             echo "No YAML files changed. Skipping check."
             exit 0
