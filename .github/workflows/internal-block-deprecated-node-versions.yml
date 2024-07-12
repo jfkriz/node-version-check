@@ -40,7 +40,7 @@ jobs:
 
           # Function to check the node version of an action
           check_node_version() {
-            action=$1
+            action=$(echo $1 | tr -d '"')
             owner_repo=$(echo "$action" | cut -d'@' -f1)
             version=$(echo "$action" | cut -d'@' -f2)
             metadata_url="https://raw.githubusercontent.com/$owner_repo/$version/action.yml"
