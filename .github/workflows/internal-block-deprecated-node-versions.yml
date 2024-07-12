@@ -1,0 +1,71 @@
+# This workflow runs when a PR is created, and will verify that
+# no deprecated Node.js versions are used in the workflow actions.
+name: Check Node Version in GitHub Actions
+
+on: pull_request
+
+jobs:
+  check-node-version:
+    runs-on: [self-hosted, aks]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install jq and yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo pip install yq
+
+      - name: Check for deprecated Node.js versions in workflows
+        run: |
+          # Find all changed YAML files
+          files=$(git diff --name-only origin/main | grep '\.yml$')
+          if [ -z "$files" ]; then
+            echo "No YAML files changed. Skipping check."
+            exit 0
+          fi
+
+          error=0
+
+          # Function to check the node version of an action
+          check_node_version() {
+            action=$1
+            owner_repo=$(echo "$action" | cut -d'@' -f1)
+            version=$(echo "$action" | cut -d'@' -f2)
+            metadata_url="https://raw.githubusercontent.com/$owner_repo/$version/action.yml"
+            metadata=$(curl -s $metadata_url)
+            if [ -z "$metadata" ]; then
+              metadata_url="https://raw.githubusercontent.com/$owner_repo/$version/action.yaml"
+              metadata=$(curl -s $metadata_url)
+            fi
+            if [ -z "$metadata" ]; then
+              echo "Warning: Could not retrieve metadata for $action"
+              return
+            fi
+            node_version=$(echo "$metadata" | yq eval '.runs.using' -)
+            if [[ "$node_version" == *"node12"* || "$node_version" == *"node14"* || "$node_version" == *"node16"* ]]; then
+              echo "Error: $action uses deprecated Node.js version $node_version"
+              error=1
+            fi
+          }
+
+          # Check each changed YAML file
+          for file in $files; do
+            echo "Checking $file..."
+
+            # Parse each action's uses line and check the version
+            yq eval '.jobs.*.steps[] | select(.uses) | .uses' "$file" | while read -r use; do
+              echo "Checking action: $use"
+              check_node_version "$use"
+            done
+          done
+
+          if [ $error -eq 1 ]; then
+            exit 1
+          fi
