@@ -40,7 +40,7 @@ jobs:
 
           # Function to check the node version of an action
           check_node_version() {
-            action=$(echo $1 | tr -d '"')
+            action=$1
             owner_repo=$(echo "$action" | cut -d'@' -f1)
             version=$(echo "$action" | cut -d'@' -f2)
             metadata_url="https://raw.githubusercontent.com/$owner_repo/$version/action.yml"
@@ -53,9 +53,7 @@ jobs:
               echo "Warning: Could not retrieve metadata for $action"
               return 1
             fi
-            echo "$owner_repo@$version"
-            echo "Metadata URL: $metadata_url"
-            node_version=$(echo "$metadata" | yq '.runs.using' -)
+            node_version=$(echo "$metadata" | yq -r '.runs.using' -)
             if [[ "$node_version" == *"node12"* || "$node_version" == *"node14"* || "$node_version" == *"node16"* ]]; then
               echo "Error: $action uses deprecated Node.js version $node_version"
               return 1
@@ -70,7 +68,7 @@ jobs:
             echo "Checking $file..."
 
             # Parse each action's uses line and check the version
-            yq '.jobs[] | .steps[] | select(.uses) | .uses' "$file" | while read -r use; do
+            yq -r '.jobs[] | .steps[] | select(.uses) | .uses' "$file" | while read -r use; do
               echo "Checking action: $use"
               check_node_version "$use"
               if [ $? -eq 1 ]; then
